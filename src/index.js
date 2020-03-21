@@ -1,28 +1,38 @@
 import React from "react";
-import { render } from "react-dom";
-import DevTools from "mobx-react-devtools";
+import ReactDOM from 'react-dom'
+import {observable} from 'mobx'
 
-import TodoList from "./components/TodoList";
-import TodoListModel from "./models/TodoListModel";
-import TodoModel from "./models/TodoModel";
+import { observer } from "mobx-react"
 
-const store = new TodoListModel();
 
-render(
-  <div>
-    <DevTools />
-    <TodoList store={store} />
-  </div>,
-  document.getElementById("root")
-);
 
-store.addTodo("Get Coffee");
-store.addTodo("Write simpler code");
-store.todos[0].finished = true;
+//N.B the observable MUST be out of the component
+// this is something like state
 
-setTimeout(() => {
-  store.addTodo("Get a cookie as well");
-}, 2000);
+var timerData = observable({
+    secondsPassed: 0
+})
 
+// component observer of observable
+const Timer = observer((props) =>{
+  const {timerData}=props
+  return(
+    <div>
+    <button onClick={()=>{setInterval(() => timerData.secondsPassed++, 1000)}}> START</button>
+    <span>Seconds passed: {timerData.secondsPassed} </span>
+    </div>
+  )
+  
+})
+
+// Alternatively, a class based component:
+// @observer
+// class Timer extends React.Component {
+//     render() {
+//         return <span>Seconds passed: {this.props.timerData.secondsPassed} </span>
+//     }
+// }
+
+ReactDOM.render(<Timer timerData={timerData} />, document.getElementById('root'))
 // playing around in the console
-window.store = store;
+//window.store = store;
